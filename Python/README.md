@@ -28,22 +28,16 @@ Each folder represents a week of the course, focusing on different programming c
 My final project is a **Tic Tac Toe game** developed entirely in Python.  
 It allows two players to compete in the console, displaying the board and validating each move.
 
-### 🔑 Key Features
-- Dynamic board updates after each turn  
-- Automatic winner or draw detection  
-- Input validation to prevent invalid moves  
-- Modular and easy-to-read code  
-
-This project demonstrates my ability to design and implement a complete program using **functions, lists, conditionals, and loops**.
-
----
-
-## 🛠️ Technologies Used
-- Python  
-- Git & GitHub  
+### 🔑 Additional Features
+- **Single-player mode vs AI** with three difficulty levels:
+  - Easy → random moves.  
+  - Normal → win/defend strategy + random fallback.  
+  - Impossible → unbeatable AI using the **minimax algorithm**.  
+- **Board rendering** with the `tabulate` library for a clean, user-friendly display.  
+- **Error handling** with custom exceptions (`MoveError`) for invalid or repeated moves.  
+- **Winner detection** that checks all possible winning combinations and declares ❌, ⭕, or Draw.  
+- **Input validation** to ensure smooth gameplay and prevent crashes.  
 
 ---
 
-**Author:** Patrick  
-**Course:** CS50’s Introduction to Programming with Python  
-**Year:** 2026
+
