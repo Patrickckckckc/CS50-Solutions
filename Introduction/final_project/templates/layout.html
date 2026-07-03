@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Meditation App{% endblock %}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        {% block head %}{% endblock %}
+    </head>
+
+    <body>
+        <h1><a href="/">Home</a></h1>
+        <div class="content">
+            {% block content %}{% endblock %}
+            {% block scripts %}{% endblock %}
+        </div>
+    </body>
+
+    <footer>
+        <p>
+            <a href="/aboutme">About Me</a>
+        </p>
+        {% if username %}
+            <p><a href="/logout">Logout</a></p>
+        {% else %}
+            <p><a href="/register">Register</a></p>
+            <p><a href="/login">Login</a></p>
+        {% endif %}
+    </footer>
+
+</html>

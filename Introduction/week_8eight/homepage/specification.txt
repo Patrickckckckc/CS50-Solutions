@@ -1,0 +1,24 @@
+HTML Tags (10):
+1. <link> – Used to include external stylesheets (Bootstrap, Font Awesome, custom CSS).
+2. <script> – Used to include JavaScript files (Bootstrap bundle, custom script.js).
+3. <meta> – Used to set viewport for responsive design.
+4. <title> – Used to set the page title.
+5. <div> – Used for layout and grouping content with Bootstrap classes.
+6. <h1> – Used for the main page heading.
+7. <h4> – Used for subsection headings.
+8. <ul> – Used to create an unordered list of links.
+9. <li> – Used for individual list items.
+10. <a> – Used for hyperlinks to other pages.
+
+CSS Properties (5):
+1. color – Used to set text color (white).
+2. font-style – Used to italicize text in the header.
+3. font-family – Used to specify fonts (Georgia, Arial, Helvetica, sans-serif).
+4. background-color – Used to set the page background to black.
+5. display – Used to control layout (block display for images).
+
+JavaScript:
+I used JavaScript to add interactivity and dynamic behavior to the page, such as handling events or enhancing user experience.
+
+Bootstrap:
+I used Bootstrap to simplify responsive design and styling, leveraging its grid system and prebuilt classes for layout and formatting.

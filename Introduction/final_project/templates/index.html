@@ -1,0 +1,168 @@
+{% extends "layout.html" %}
+
+{% block title %}Homepage{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        {% if username %}
+        <!-- Welcome section -->
+            <div id="welcome" class="mb-3">
+                <h2 style="text-align: left;">Welcome {{username}}!</h2>
+                <button id="view-profile" class="btn btn-info">View Profile</button>
+            </div>
+
+        <!-- Profile view (hidden until toggled) -->
+            <div id="profile_view" style="display:none;">
+            <!-- Top section: user info -->
+                <div id="profile_info" class="mb-4">
+                    <h3 id="user_name">User: {{username}}</h3>
+                </div>
+
+            <!-- Bottom section: comments -->
+                <div id="profile_comments" class="d-flex mt-4">
+            <!-- Left half: user’s own comments -->
+                    <div class="flex-fill p-3 border-end">
+                        <h2>My Comments</h2>
+                        <div id="user_comments">
+                            <ul>
+                                {% for comment in my_comments %}
+                                    <li>
+                                        <strong>{{ comment.username }}</strong>: {{ comment.content }}
+                                        <small>{{ comment.created_at }}</small>
+                                        <div class="reactions">
+                                            <button class="like-btn {% if comment.user_reaction == 'like' %}active-like{% endif %}" data-id="{{ comment.id }}">
+                                                👍 {{ comment.likes }}
+                                            </button>
+                                            <button class="dislike-btn {% if comment.user_reaction == 'dislike' %}active-dislike{% endif %}" data-id="{{ comment.id }}">
+                                                👎 {{ comment.dislikes }}
+                                            </button>
+                                            {% if user_id == comment.user_id %}
+                                                <button class="delete-btn" data-id="{{ comment.id }}">🗑 Delete</button>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% else %}
+                                    <p>No comments written yet.</p>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+             <!-- Right half: liked comments -->
+                    <div class="flex-fill p-3">
+                        <h2>Liked Comments</h2>
+                        <div id="user_comments_liked">
+                            <ul>
+                                {% for comment in liked_comments %}
+                                    <li>
+                                        <strong>{{ comment.username }}</strong>: {{ comment.content }}
+                                        <small>{{ comment.created_at }}</small>
+                                        <div class="reactions">
+                                            <button class="like-btn {% if comment.user_reaction == 'like' %}active-like{% endif %}" data-id="{{ comment.id }}">
+                                                👍 {{ comment.likes }}
+                                            </button>
+                                            <button class="dislike-btn {% if comment.user_reaction == 'dislike' %}active-dislike{% endif %}" data-id="{{ comment.id }}">
+                                                👎 {{ comment.dislikes }}
+                                            </button>
+                                        </div>
+                                    </li>
+                                {% else %}
+                                    <p>No liked comments yet.</p>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            </div>
+        {% endif %}
+    </div>
+
+
+<!-- Meditation options -->
+ <div id="select_view">
+     <h2>SELECT YOUR MEDITATION:</h2>
+ </div>
+
+
+<!-- Add inline styles here to avoid conflicts with the external CSS -->
+    <style>
+        #index_view {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .option {
+            flex: 1;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(25, 25, 50, 0.85);
+            color: #ffcc66;
+        }
+
+        .option h2 {
+            text-align: left;
+            margin-bottom: 15px;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+
+        .option a {
+            display: inline-block;
+            margin: 10px 0;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #66ccff, #3399ff);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .option .description {
+            margin-top: 10px;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: left;
+        }
+    </style>
+
+    <div class="container mt-5">
+        <div id="index_view">
+    <!-- Left side -->
+            <div class="option" id="normal-meditation">
+                <h2>Normal Meditation</h2>
+                <a id="normal-btn" href="/normal_meditation">Start</a>
+                <p id="normal-desc" class="description">
+                    Focus your mind on a single point — a mantra, your breath, or a mental image.
+                    As your attention steadies, scattered thoughts fade and you enter a calm state
+                    where problems lose their grip.
+                </p>
+            </div>
+
+    <!-- Right side -->
+            <div class="option" id="lettinggo-meditation">
+                <h2>Letting Go Meditation</h2>
+                <a id="lettinggo-btn" href="/lettingo_meditation">Start</a>
+                <p id="lettinggo-desc" class="description">
+                    Instead of avoiding your problems, you turn toward them. Concentrate on the
+                    feelings they create without resisting. As you observe openly, tension dissolves
+                    and emotions flow freely, leaving you lighter and more complete.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+    <script src="{{ url_for('static', filename='meditation.js') }}"></script>
+{% endblock %}

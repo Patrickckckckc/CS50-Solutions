@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block title %}Lettin Go Meditation{% endblock %}
+
+
+{% block content %}
+
+<!-- VIDEO -->
+  <div class="video-container">
+    <video id="meditation-video" width="640" height="360" controls>
+      <source src="{{ url_for('static', filename='lettingomeditation.mp4') }}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+
+  <!-- COMMENT SECTION -->
+
+  <div id="comments">
+    <h3>💬 Comments</h3>
+
+    {% if user_id %}
+      <form id="comment-form" method="POST" action="/add_comment">
+        <input type="hidden" name="video_id" value="2">
+        <textarea
+          name="content"
+          placeholder="Write your comment..."
+          required
+          minlength="1">
+        </textarea>
+        <button type="submit">Post Comment</button>
+      </form>
+    {% else %}
+      <p>Please log in to comment.</p>
+    {% endif %}
+
+
+    <ul id="comment-list">
+      {% for comment in comments %}
+        <li>
+          <strong>{{ comment.username }}</strong>: {{ comment.content }}
+          <div class="reactions">
+            <button class="like-btn {% if comment.user_reaction == 'like' %}active-like{% endif %}" data-id="{{ comment.id }}">
+              👍 {{ comment.likes }}
+            </button>
+            <button class="dislike-btn {% if comment.user_reaction == 'dislike' %}active-dislike{% endif %}" data-id="{{ comment.id }}">
+              👎 {{ comment.dislikes }}
+            </button>
+
+            {% if user_id == comment.user_id %}
+              <button class="delete-btn" data-id="{{ comment.id }}">🗑 Delete</button>
+            {% endif %}
+
+            <small>{{ comment.created_at }}</small>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+
+  </div>
+
+  <script src="{{ url_for('static', filename='meditation.js') }}"></script>
+
+{% endblock %}

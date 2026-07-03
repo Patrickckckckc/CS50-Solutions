@@ -1,0 +1,1 @@
+SELECT MIN("0m") FROM normals WHERE "0m" IS NOT NULL;

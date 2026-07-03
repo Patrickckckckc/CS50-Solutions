@@ -1,0 +1,47 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Add Listing</h2>
+    <form action="{% url 'addlisting' %}" method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input id="title" name="title" type="text" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" class="form-control" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Starting Bid</label>
+            <input id="price" name="price" type="number" step="0.01" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="image_url">Image URL (optional)</label>
+            <input id="image_url" name="image_url" type="url" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category (optional)</label>
+            <select id="category" name="category" class="form-control">
+                <option value="">-- Select a category --</option>
+                <option value="ELEC">Electronics</option>
+                <option value="FASH">Fashion</option>
+                <option value="HOME">Home & Garden</option>
+                <option value="TOYS">Toys & Games</option>
+                <option value="BOOK">Books</option>
+                <option value="SPORT">Sports</option>
+                <option value="AUTO">Automotive</option>
+                <option value="MUSIC">Music</option>
+                <option value="MOVIE">Movies</option>
+                <option value="OTHER">Other</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Listing</button>
+    </form>
+{% endblock %}

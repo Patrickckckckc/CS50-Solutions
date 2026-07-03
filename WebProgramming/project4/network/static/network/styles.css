@@ -1,0 +1,118 @@
+/* General page styling */
+body {
+    background-color: #f5f7fa; /* light neutral background */
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Headings */
+h2, h3 {
+    color: #2e8b57; /* green accent */
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* Post cards */
+.card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.card-title a {
+    color: #2e8b57;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.card-title a:hover {
+    text-decoration: underline;
+    color: #3cb371;
+}
+
+/* Post content */
+.card-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Timestamp */
+.text-muted {
+    font-size: 0.85rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.like-button.btn-success {
+    background-color: #2e8b57;
+    border-color: #2e8b57;
+    color: #fff;
+}
+
+.dislike-button.btn-danger {
+    background-color: #b22222;
+    border-color: #b22222;
+    color: #fff;
+}
+
+.like-button:hover, .dislike-button:hover, .btn-outline-primary:hover {
+    transform: scale(1.05);
+}
+
+/* Form styling */
+textarea.form-control {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: none;
+    transition: border-color 0.2s ease;
+}
+
+textarea.form-control:focus {
+    border-color: #2e8b57;
+    box-shadow: 0 0 6px rgba(46,139,87,0.3);
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: #2e8b57;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: #2e8b57;
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #aaa;
+    background-color: transparent;
+}
+
+/* Alerts */
+.alert-info {
+    background-color: #e8f5e9;
+    border: 1px solid #2e8b57;
+    color: #2e8b57;
+    border-radius: 8px;
+}
+
+.alert-danger {
+    background-color: #fdecea;
+    border: 1px solid #b22222;
+    color: #b22222;
+    border-radius: 8px;
+}

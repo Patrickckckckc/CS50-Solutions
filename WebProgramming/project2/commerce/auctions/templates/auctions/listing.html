@@ -1,0 +1,106 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <!--Display the Listing-->
+
+    <div class="container mt-4">
+    <div class="card shadow-sm">
+
+        {% if listing.image_url %}
+            <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}">
+        {% endif %}
+        <div class="card-body">
+            <h3 class="card-title">{{ listing.title }}</h3>
+            <p class="card-text">{{ listing.description }}</p>
+            <p class="card-text">
+                <strong>Price:</strong> ${{ listing.price }}
+            </p>
+            <p class="card-text">
+                <strong>Category:</strong> {{ listing.get_category_display }}
+            </p>
+            <p class="card-text">
+                <small class="text-muted">
+                    Posted by {{ listing.user.username }} on {{ listing.created_at }}
+                </small>
+            </p>
+            </div>
+        </div>
+    </div>
+
+    {% if listing.is_active %}
+    <!-- Offer Bid -->
+    <form action="{% url 'add_bid' listing.id %}" method="POST">
+        {% csrf_token %}
+        <input type="number" name="bid" id="bid" step="0.01" min="0" placeholder="Offer Bid" required>
+        <input type="submit" value="Place Bid">
+    </form>
+    {% else %}
+       <h3> THE BID IS CLOSED </h3>
+
+    <!-- If the user has won the auction-->
+       {% if winner_auction_option %}
+        <p>🎉 Congratulations! You Won this auction.</p>
+       {% endif %}
+    {% endif %}
+
+
+
+    <!-- Add Watchlist -->
+    <form action="{% url 'toggle_watchlist' listing.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit">
+            {% if listing.id in user_watchlist_ids %}
+                Remove from Watchlist
+            {% else %}
+                Add to Watchlist
+            {% endif %}
+            </button>
+    </form>
+
+
+    <!-- If you are the creator of the page you can CLOSE the post -->
+    {% if listing.is_active %}
+    {% if cancel_auction_option %}
+    <form action="{% url 'cancel_listing' listing.id %}" method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Cancel Auction</button>
+    </form>
+    {% endif %}
+    {% endif %}
+
+
+
+ <!-- Comments Section -->
+<div class="comments mt-4">
+    <h3 class="mb-3">💬 Comments</h3>
+
+    <!-- Add Comment Form -->
+    <form action="{% url 'add_comment' listing.id %}" method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="form-group">
+            <textarea name="content" class="form-control" rows="3" placeholder="Write your comment..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Post Comment</button>
+    </form>
+
+    <!-- Display Comments -->
+    {% if comments %}
+        <div class="list-group">
+            {% for comment in comments %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ comment.user.username }}</strong>
+                        <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1">{{ comment.content }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No comments yet. Be the first to comment!</p>
+    {% endif %}
+</div>
+
+
+{% endblock %}

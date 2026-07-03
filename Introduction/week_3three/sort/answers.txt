@@ -1,0 +1,11 @@
+sort1 uses: Bubble Sort
+
+How do you know?: Has the biggest difference between times, BIG OMEGA -> n, BIG O -> n square
+
+sort2 uses: Merge Sort
+
+How do you know?: The fastest from all the sorts, BIG THETA -> n logn
+
+sort3 uses: Selection Sort
+
+How do you know?: Is not so fast, but all the times are all most the same, BIG THETA -> n square

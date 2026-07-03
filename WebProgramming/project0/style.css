@@ -1,0 +1,43 @@
+form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#form_advanced{
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+button{
+    color: white;
+    background-color: blue;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+}
+
+input{
+    display: block;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+}
+
+
+
+.link{
+    display: flex;
+    justify-content: flex-end;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.link:hover{
+    color: red;
+    font-size: 20px;
+    text-decoration: underline;
+}
+

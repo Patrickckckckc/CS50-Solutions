@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist</h2>
+
+    {% for listing in listings %}
+        <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px;">
+            <h3><a href="{% url 'listing' listing.id%}" >{{ listing.title }}</a></h3>
+            <p>{{ listing.description }}</p>
+            <p><strong>Current Price:</strong> ${{ listing.price }}</p>
+            {% if listing.image_url %}
+                <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="max-width:300px;">
+            {% endif %}
+            <p><em>Posted by {{ listing.user.username }} on {{ listing.created_at }}</em></p>
+        </div>
+        <form action="{% url 'toggle_watchlist' listing.id %}", method="POST">
+            {% csrf_token %}
+            <button type="submit">
+                Remove from Watchlist
+            </button>
+        </form>
+
+    {% empty %}
+        <p>No listings on your Watch List yet.</p>
+    {% endfor %}
+
+{% endblock %}

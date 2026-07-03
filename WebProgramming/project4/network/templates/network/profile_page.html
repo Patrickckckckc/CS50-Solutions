@@ -1,0 +1,250 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
+
+{% block body %}
+<div class="card mb-4">
+    <div class="card-body text-center">
+        <img src="{% static 'network/default_profile.png' %}"
+             class="rounded-circle mb-3 img-fluid"
+             alt="Profile picture"
+             width="120" height="120">
+        <h3 class="card-title">{{ profile_user.username }}</h3>
+        <p class="text-muted">Joined: {{ profile_user.date_joined|date:"F j, Y" }}</p>
+
+        <!-- Follow / Unfollow button -->
+        {% if user.is_authenticated and user != profile_user %}
+            <form method="post" action="{% url 'follow_toggle' profile_user.id %}">
+                {% csrf_token %}
+                {% if profile_user in user.following.all %}
+                    <button type="submit" class="btn btn-danger btn-sm mt-2">Unfollow</button>
+                {% else %}
+                    <button type="submit" class="btn btn-primary btn-sm mt-2">Follow</button>
+                {% endif %}
+            </form>
+        {% endif %}
+
+        <!-- Followers / Following counts -->
+        <div class="d-flex justify-content-center mt-3">
+            <div class="mx-3">
+                <strong>{{ profile_user.followers.count }}</strong><br>
+                <small class="text-muted">Followers</small>
+            </div>
+            <div class="mx-3">
+                <strong>{{ profile_user.following.count }}</strong><br>
+                <small class="text-muted">Following</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User posts -->
+<h4 class="mb-3">Posts by {{ profile_user.username }}</h4>
+{% if page_obj %}
+    {% for post in page_obj %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <!-- Unique ID for post content -->
+                <p id="post-content-{{ post.id }}" class="card-text">{{ post.content }}</p>
+                <p class="card-text">
+                    <small class="text-muted">{{ post.timestamp }}</small>
+                </p>
+
+                 <!-- Like/Dislike section with unique IDs -->
+                            <button type="button"
+                                    class="btn btn-sm {% if post.user_reaction == 'like' %}btn-success{% else %}btn-outline-success{% endif %} like-button"
+                                    data-post-id="{{ post.id }}">
+                                {% if post.user_reaction == 'like' %}👍 Liked{% else %}👍{% endif %}
+                            </button>
+
+                            <span id="likes-{{ post.id }}">{{ post.likes }}</span>
+
+                            <button type="button"
+                                    class="btn btn-sm {% if post.user_reaction == 'dislike' %}btn-danger{% else %}btn-outline-danger{% endif %} dislike-button"
+                                    data-post-id="{{ post.id }}">
+                                {% if post.user_reaction == 'dislike' %}👎 Disliked{% else %}👎{% endif %}
+                            </button>
+
+                            <span id="dislikes-{{ post.id }}">{{ post.dislikes }}</span>
+
+                <!-- Edit button + hidden form only if logged-in user owns this profile -->
+                {% if user.is_authenticated and user == profile_user %}
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 edit-button-class" data-post-id="{{ post.id }}">
+                        Edit
+                    </button>
+
+                    <form id="edit-form-{{ post.id }}" class="mt-2 d-none edit-form-class" method="post" action="{% url 'edit_post' post.id %}">
+                        {% csrf_token %}
+                        <textarea name="content" class="form-control" rows="3">{{ post.content }}</textarea>
+                        <button type="submit" class="btn btn-success btn-sm mt-2 save-button-class" data-post-id="{{ post.id }}">
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm mt-2 cancel-button-class" data-post-id="{{ post.id }}">
+                            Cancel
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Pagination controls -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% else %}
+    <div class="alert alert-info">
+        {{ profile_user.username }} hasn’t posted anything yet.
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block script %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Like buttons
+    document.querySelectorAll(".like-button").forEach(button => {
+        button.addEventListener("click", () => {
+            const postId = button.dataset.postId;
+            toggleReaction(postId, "like");
+        });
+    });
+
+    // Dislike buttons
+    document.querySelectorAll(".dislike-button").forEach(button => {
+        button.addEventListener("click", () => {
+            const postId = button.dataset.postId;
+            toggleReaction(postId, "dislike");
+        });
+    });
+
+    // Edit buttons
+    document.querySelectorAll(".edit-button-class").forEach(button => {
+        button.addEventListener("click", () => {
+            const postId = button.dataset.postId;
+            showForm(postId);
+        });
+    });
+
+    // Cancel buttons
+    document.querySelectorAll(".cancel-button-class").forEach(button => {
+        button.addEventListener("click", () => {
+            const postId = button.dataset.postId;
+            hideForm(postId);
+        });
+    });
+
+    // Save buttons
+    document.querySelectorAll(".save-button-class").forEach(button => {
+        button.addEventListener("click", (event) => {
+            event.preventDefault();
+            const postId = button.dataset.postId;
+            postForm(postId);
+        });
+    });
+});
+
+// Show/Hide edit form
+function showForm(postId) {
+    document.getElementById(`edit-form-${postId}`).classList.remove("d-none");
+}
+function hideForm(postId) {
+    document.getElementById(`edit-form-${postId}`).classList.add("d-none");
+}
+
+// Submit edit form
+function postForm(postId) {
+    const form = document.getElementById(`edit-form-${postId}`);
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            hideForm(postId);
+            const contentElement = document.getElementById(`post-content-${postId}`);
+            if (contentElement) contentElement.textContent = data.content;
+            showSuccessAlert("Post updated successfully!");
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+// Toggle like/dislike
+function toggleReaction(postId, action) {
+    fetch(`/toggle_${action}/${postId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update counts
+            document.getElementById(`likes-${postId}`).textContent = data.likes;
+            document.getElementById(`dislikes-${postId}`).textContent = data.dislikes;
+
+            // Highlight active reaction + update button text
+            const likeBtn = document.querySelector(`.like-button[data-post-id="${postId}"]`);
+            const dislikeBtn = document.querySelector(`.dislike-button[data-post-id="${postId}"]`);
+
+            if (data.user_reaction === "like") {
+                likeBtn.classList.add("btn-success");
+                dislikeBtn.classList.remove("btn-danger");
+                likeBtn.textContent = "👍 Liked";
+                dislikeBtn.textContent = "👎";
+            } else if (data.user_reaction === "dislike") {
+                dislikeBtn.classList.add("btn-danger");
+                likeBtn.classList.remove("btn-success");
+                dislikeBtn.textContent = "👎 Disliked";
+                likeBtn.textContent = "👍";
+            } else {
+                // No reaction
+                likeBtn.classList.remove("btn-success");
+                dislikeBtn.classList.remove("btn-danger");
+                likeBtn.textContent = "👍";
+                dislikeBtn.textContent = "👎";
+            }
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+// Success alert
+function showSuccessAlert(message) {
+    const alert = document.createElement("div");
+    alert.className = "alert alert-success mt-2";
+    alert.textContent = message;
+    document.querySelector(".body").prepend(alert);
+    setTimeout(() => alert.remove(), 3000);
+}
+</script>
+{% endblock %}

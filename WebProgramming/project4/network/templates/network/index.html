@@ -1,0 +1,236 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    {% if message %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endif %}
+
+    <h2>Home</h2>
+    <div id="addpost-view">
+        <form id="new-post-form" method="post" action="/new_post">
+            {% csrf_token %}
+            <textarea id="new-post-content" name="new-post-content" class="form-control" placeholder="New Post"></textarea>
+            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+        </form>
+    </div>
+
+    <div id="allposts-view">
+        {% if user.is_authenticated %}
+            {% if page_obj %}
+                {% for post in page_obj %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'profile_page' post.user.id %}">
+                                    {{ post.user.username }}
+                                </a>
+                            </h5>
+
+                            <p id="post-content-{{ post.id }}" class="card-text">{{ post.content }}</p>
+
+                            <p class="card-text">
+                                <small class="text-muted">{{ post.timestamp }}</small>
+                            </p>
+
+                            <!-- Like/Dislike section -->
+                            <button type="button"
+                                    class="btn btn-sm {% if post.user_reaction == 'like' %}btn-success{% else %}btn-outline-success{% endif %} like-button"
+                                    data-post-id="{{ post.id }}">
+                                {% if post.user_reaction == 'like' %}👍 Liked{% else %}👍{% endif %}
+                            </button>
+
+                            <span id="likes-{{ post.id }}">{{ post.likes }}</span>
+
+                            <button type="button"
+                                    class="btn btn-sm {% if post.user_reaction == 'dislike' %}btn-danger{% else %}btn-outline-danger{% endif %} dislike-button"
+                                    data-post-id="{{ post.id }}">
+                                {% if post.user_reaction == 'dislike' %}👎 Disliked{% else %}👎{% endif %}
+                            </button>
+
+                            <span id="dislikes-{{ post.id }}">{{ post.dislikes }}</span>
+
+                            {% if user.is_authenticated and user == post.user %}
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2 edit-button-class" data-post-id="{{ post.id }}">
+                                    Edit
+                                </button>
+
+                                <form id="edit-form-{{ post.id }}" class="mt-2 d-none edit-form-class" method="post" action="{% url 'edit_post' post.id %}">
+                                    {% csrf_token %}
+                                    <textarea name="content" class="form-control" rows="3">{{ post.content }}</textarea>
+                                    <button type="submit" class="btn btn-success btn-sm mt-2 save-button-class" data-post-id="{{ post.id }}">
+                                        Save
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm mt-2 cancel-button-class" data-post-id="{{ post.id }}">
+                                        Cancel
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Pagination controls -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    // Like buttons
+            document.querySelectorAll(".like-button").forEach(button => {
+                button.addEventListener("click", () => {
+                    const postId = button.dataset.postId;
+                    toggleReaction(postId, "like");
+                });
+            });
+
+    // Dislike buttons
+            document.querySelectorAll(".dislike-button").forEach(button => {
+                button.addEventListener("click", () => {
+                    const postId = button.dataset.postId;
+                    toggleReaction(postId, "dislike");
+                });
+            });
+
+    // Edit buttons
+            document.querySelectorAll(".edit-button-class").forEach(button => {
+                button.addEventListener("click", () => {
+                    const postId = button.dataset.postId;
+                    showForm(postId);
+                });
+            });
+
+    // Cancel buttons
+            document.querySelectorAll(".cancel-button-class").forEach(button => {
+                button.addEventListener("click", () => {
+                    const postId = button.dataset.postId;
+                    hideForm(postId);
+                });
+            });
+
+    // Save buttons
+            document.querySelectorAll(".save-button-class").forEach(button => {
+                button.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    const postId = button.dataset.postId;
+                    postForm(postId);
+                });
+            });
+        });
+
+// Show/Hide edit form
+        function showForm(postId) {
+            document.getElementById(`edit-form-${postId}`).classList.remove("d-none");
+        }
+        function hideForm(postId) {
+            document.getElementById(`edit-form-${postId}`).classList.add("d-none");
+        }
+
+// Submit edit form
+        function postForm(postId) {
+            const form = document.getElementById(`edit-form-${postId}`);
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        hideForm(postId);
+                        const contentElement = document.getElementById(`post-content-${postId}`);
+                        if (contentElement) contentElement.textContent = data.content;
+                        showSuccessAlert("Post updated successfully!");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+// Toggle like/dislike
+        function toggleReaction(postId, action) {
+            fetch(`/toggle_${action}/${postId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+            // Update counts
+                        document.getElementById(`likes-${postId}`).textContent = data.likes;
+                        document.getElementById(`dislikes-${postId}`).textContent = data.dislikes;
+
+            // Highlight active reaction + update button text
+                        const likeBtn = document.querySelector(`.like-button[data-post-id="${postId}"]`);
+                        const dislikeBtn = document.querySelector(`.dislike-button[data-post-id="${postId}"]`);
+
+                        if (data.user_reaction === "like") {
+                            likeBtn.classList.add("btn-success");
+                            dislikeBtn.classList.remove("btn-danger");
+                            likeBtn.textContent = "👍 Liked";
+                            dislikeBtn.textContent = "👎";
+                        } else if (data.user_reaction === "dislike") {
+                            dislikeBtn.classList.add("btn-danger");
+                            likeBtn.classList.remove("btn-success");
+                            dislikeBtn.textContent = "👎 Disliked";
+                            likeBtn.textContent = "👍";
+                        } else {
+                // No reaction
+                            likeBtn.classList.remove("btn-success");
+                            dislikeBtn.classList.remove("btn-danger");
+                            likeBtn.textContent = "👍";
+                            dislikeBtn.textContent = "👎";
+                        }
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+// Success alert
+        function showSuccessAlert(message) {
+            const alert = document.createElement("div");
+            alert.className = "alert alert-success mt-2";
+            alert.textContent = message;
+            document.querySelector(".body").prepend(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+    </script>
+{% endblock %}

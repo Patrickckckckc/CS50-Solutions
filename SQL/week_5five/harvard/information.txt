@@ -1,0 +1,13 @@
+Find a student’s historical course enrollments, based on their ID: 0.000156 -> 0.000148 (Innecesary)
+
+Find all students who enrolled in Computer Science 50 in Fall 2023: 0.000278 -> 0.000180 (35% better)
+
+Sort courses by most- to least-enrolled in Fall 2023:: 0.000343 -> 0.000357 (Innecesary)
+
+Find all computer science courses taught in Spring 2024: (Innecesary) 0.000110
+
+Find the requirement satisfied by “Advanced Databases” in Fall 2023: 0.000417 -> 0.000157(c)
+
+Find how many courses in each requirement a student has satisfied: (Innecesary) 0.000198
+
+Search for a course by title and semester: 0.000151 (c)
